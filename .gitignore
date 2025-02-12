@@ -1,6 +1,6 @@
 *.csv
 *.tmp
-*.json
 /data/*
-!/data/matchdata_sample*
+/data/matchdata_sample*
 /tools
+node_modules
