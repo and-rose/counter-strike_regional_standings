@@ -114,13 +114,7 @@ class Glicko {
     return Math.max(this.mMinRD, Math.min(this.mMaxRD, rd));
   }
 
-  newTeam(
-    rank: number | undefined = undefined,
-    rd: number | undefined = undefined,
-  ) {
-    if (rank === undefined) rank = this.mStartingRank;
-    if (rd === undefined) rd = this.mStartingRD;
-
+  newTeam(rank = this.mStartingRank, rd = this.mStartingRD) {
     return new GlickoTeam(rank, rd);
   }
 

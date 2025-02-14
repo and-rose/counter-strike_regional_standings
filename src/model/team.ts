@@ -143,14 +143,9 @@ class Team {
   // A past team is considered as the same entity as a more recent one,
   // if it shares enough players.
   sharesRoster(players: Player[]) {
-    let overlap = 0;
-    players.forEach((pNew) => {
-      this.players.forEach((pExisting) => {
-        if (pNew.playerId === pExisting.playerId) {
-          overlap += 1;
-        }
-      });
-    });
+    const overlap = players.filter((pNew) =>
+      this.players.some((pExisting) => pNew.playerId === pExisting.playerId),
+    ).length;
 
     return overlap >= TEAM_OVERLAP_TO_SHARE_ROSTER;
   }

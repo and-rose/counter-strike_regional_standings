@@ -137,7 +137,7 @@ function displayRankings(teams: Team[], regions: number[], strDate: string) {
       if (regions.length === 1) displayRank = t.regionalRank[regions[0]];
 
       table.addElem(displayRank);
-      table.addElem(t.glickoTeam!.rank());
+      table.addElem(t.glickoTeam.rank());
       table.addElem(t.name);
       table.addElem(
         sortCaseInsensitive(t.players.map((p) => p.nick)).join(", "),
@@ -292,7 +292,7 @@ function displayTeamRankingSummary(team: Team, teams: Team[], strDate: string) {
     let eventWeight = "-";
 
     let roster =
-      tm.match.team1!.rosterId === team.rosterId
+      tm.match.team1.rosterId === team.rosterId
         ? tm.match.team1Players
         : tm.match.team2Players;
 
@@ -336,14 +336,14 @@ function displayTeamRankingSummary(team: Team, teams: Team[], strDate: string) {
     let glickoAdjustment = tm.isWinner
       ? tm.match.winnerDeltaRankValue
       : tm.match.loserDeltaRankValue;
-    glickoAdjustment = Number(glickoAdjustment!.toFixed(3));
+    glickoAdjustment = Number(glickoAdjustment.toFixed(3));
 
     table.addElem(totalMatches - idx);
     table.addElem(umid);
     table.addElem(strDate);
-    table.addElem(tm.opponent!.name);
+    table.addElem(tm.opponent.name);
     table.addElem(tm.isWinner ? "W" : "L");
-    table.addElem(tm.match.informationContent!.toFixed(3).toString());
+    table.addElem(tm.match.informationContent.toFixed(3).toString());
     table.addElem(eventWeight);
     table.addElem(bounty);
     table.addElem(net);
