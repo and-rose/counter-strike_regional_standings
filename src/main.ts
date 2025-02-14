@@ -1,6 +1,6 @@
 import { ArgsSchema } from "./applicationConfig";
-import Ranking from "./ranking";
-import Report from "./report";
+import Ranking from "./model/ranking";
+import Report from "./model/report";
 
 function run() {
   const rawArgs = {

@@ -1,4 +1,5 @@
-import Fit from "./fit";
+// @filename: fit.js
+import Fit from "./fit.js";
 
 function run() {
   const analysis = Fit.init();
