@@ -18,8 +18,8 @@ function generateOutput(teams: Team[], strDate: string) {
   const fileDate = strDate.replaceAll("-", "_");
   const year = fileDate.slice(0, 4);
   const dayOfMonth = Number(strDate.slice(-2));
-  const invitationFolder = `invitation/${year}/`;
-  const liveFolder = `live/${year}/`;
+  const invitationFolder = `output/invitation/${year}/`;
+  const liveFolder = `output/live/${year}/`;
 
   if (dayOfMonth < 8) {
     if (!fs.existsSync(invitationFolder + `${summaryFolder}${fileDate}/`))

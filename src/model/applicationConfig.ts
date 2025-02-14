@@ -24,7 +24,7 @@ export const ArgsSchema = z.object({
           "Regions must be an array containing only 'Europe', 'Americas', or 'Asia'.",
       },
     ),
-  filename: z.string().default("../data/matchdata.json"),
+  filename: z.string().default("../../data/matchdata.json"),
   date: z
     .string()
     .optional()
