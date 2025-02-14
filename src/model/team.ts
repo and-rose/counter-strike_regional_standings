@@ -85,9 +85,9 @@ class Team {
   regionalRank: number[];
   distinctTeamsDefeated: number;
   scaledWinnings: number;
-  lanWins: any[];
+  lanWins: LanWin[];
   scaledLanWins: number;
-  winnings: any[];
+  winnings: Winning[];
   bountyOffered: number;
   ownNetwork: number;
   lanParticipation: number;
