@@ -4,7 +4,7 @@ import { run } from "./model/main";
 function main() {
   const args = process.argv.slice(2);
 
-  if (args.length !== 3) {
+  if (args.length < 2) {
     console.error("Invalid number of arguments");
     process.exit(1);
   }

@@ -3,8 +3,6 @@ import { z } from "zod";
 export const ArgsSchema = z.object({
   regions: z
     .string()
-    .optional()
-    .default(JSON.stringify(["Europe", "Americas", "Asia"])) // Default as JSON string
     .transform((val) => {
       try {
         const parsed = JSON.parse(val);
@@ -24,7 +22,7 @@ export const ArgsSchema = z.object({
           "Regions must be an array containing only 'Europe', 'Americas', or 'Asia'.",
       },
     ),
-  filename: z.string().default("../../data/matchdata.json"),
+  filename: z.string(),
   date: z
     .string()
     .optional()
