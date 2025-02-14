@@ -32,3 +32,5 @@ export const ArgsSchema = z.object({
       message: "Date must be in YYYY-MM-DD format",
     }),
 });
+
+export type Args = z.infer<typeof ArgsSchema>;

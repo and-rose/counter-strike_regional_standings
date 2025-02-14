@@ -144,6 +144,7 @@ class Column<T> {
 
   // Expansion point for overriding
   // A new element was added, include it in the summary
+  // @ts-ignore - unused param
   accumulateSummary(elem: T) {}
 
   // Expansion point for overriding
@@ -362,7 +363,7 @@ class Table {
     }
 
     // TODO: should probably escape markdown special characters.
-    const { headerRow, tableRows, summaryRow } = this.generate();
+    const { headerRow, tableRows, summaryRow } = this.generate(); // @ts-ignore - unused variable
 
     // Generate alignment/table-header row
     const sepRowSplit = [];

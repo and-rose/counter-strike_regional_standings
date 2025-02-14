@@ -3,7 +3,7 @@ import DataLoader from "./data_loader";
 import Glicko from "./glicko";
 import remapValueClamped from "./util/remap_value_clamped";
 import Team from "./team";
-import { Match, Modifiers } from "./types";
+import { Match, Modifiers } from "../types";
 
 const SEED_MODIFIER_FACTORS = {
   bountyCollected: 1,
@@ -35,7 +35,7 @@ function generateRanking(versionTimestamp = -1, filename: string) {
   // Adjust rankings based on games played
   runMatches(glicko, matches);
   teams.forEach((team) => {
-    team.rankValue = team.glickoTeam!.rank();
+    team.rankValue = team.glickoTeam.rank();
   });
 
   // Remove rosters with no wins from the standings
@@ -95,25 +95,25 @@ function calculateSeedModifierValue(modifiers: Modifiers) {
 function runMatches(glicko: Glicko, matches: Match[]) {
   //matches.reverse();
   matches.forEach((match) => {
-    const team1 = match.team1!;
-    const team2 = match.team2!;
+    const team1 = match.team1;
+    const team2 = match.team2;
 
     const [winTeam, loseTeam] =
       match.winningTeam === 1 ? [team1, team2] : [team2, team1];
 
-    winTeam.startingRankValue = winTeam.glickoTeam!.rank();
-    loseTeam.startingRankValue = loseTeam.glickoTeam!.rank();
+    winTeam.startingRankValue = winTeam.glickoTeam.rank();
+    loseTeam.startingRankValue = loseTeam.glickoTeam.rank();
 
     glicko.singleMatch(
-      winTeam.glickoTeam!,
-      loseTeam.glickoTeam!,
+      winTeam.glickoTeam,
+      loseTeam.glickoTeam,
       match.informationContent,
     );
 
     match.winnerDeltaRankValue =
-      winTeam.glickoTeam!.rank() - winTeam.startingRankValue;
+      winTeam.glickoTeam.rank() - winTeam.startingRankValue;
     match.loserDeltaRankValue =
-      loseTeam.glickoTeam!.rank() - loseTeam.startingRankValue;
+      loseTeam.glickoTeam.rank() - loseTeam.startingRankValue;
   });
 }
 

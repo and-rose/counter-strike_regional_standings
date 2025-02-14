@@ -1,7 +1,7 @@
 import { beforeAll, describe, expect, it } from "vitest";
 import fs from "fs";
 import path from "path";
-import { run } from "../src/main";
+import { run } from "../src/model/main";
 
 describe("Markdown file snapshot test", () => {
   beforeAll(() => {
@@ -10,12 +10,12 @@ describe("Markdown file snapshot test", () => {
 
     // purge the output directory
     const outputDir = path.resolve(__dirname, "../output/live/2023");
-    fs.rmdirSync(outputDir, { recursive: true });
+    fs.rmSync(outputDir, { recursive: true });
 
-    const args = [
-      JSON.stringify(["Americas", "Europe", "Asia"]),
-      "data/matchdata_sample_20230829.json",
-    ];
+    const args = {
+      regions: ["Americas", "Europe", "Asia"],
+      filename: "data/matchdata_sample_20230829.json",
+    };
 
     run(args);
   });

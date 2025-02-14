@@ -2,7 +2,7 @@ import fs from "fs";
 import Table from "./table";
 import Team from "./team";
 import nthHighest from "./util/nth_highest";
-import { Player } from "./types";
+import { Player } from "../types";
 const RegionList = ["Europe", "Americas", "Asia"];
 
 const summaryFolder = "details/";
@@ -120,7 +120,7 @@ function displayRankings(teams: Team[], regions: number[], strDate: string) {
   var table = new Table();
 
   // Sort teams by rank value
-  let sortedTeams = [...teams].sort((a, b) => b.rankValue - a.rankValue);
+  // let sortedTeams = [...teams].sort((a, b) => b.rankValue - a.rankValue);
 
   table.addColumn("Standing");
   table.addNumericColumn("Points").setPrecision(0);
@@ -128,7 +128,7 @@ function displayRankings(teams: Team[], regions: number[], strDate: string) {
   table.addColumn("Roster");
   table.addColumn("");
 
-  var dispRank = 0;
+  // var dispRank = 0;
   teams.forEach((t) => {
     if (t.globalRank > 0 && regions.some((r) => t.region[r] === 1)) {
       let displayRank = t.globalRank;

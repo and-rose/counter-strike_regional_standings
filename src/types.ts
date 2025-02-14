@@ -1,4 +1,4 @@
-import Team from "./team";
+import Team from "./model/team";
 
 export type EventData = {
   eventId: number;
@@ -26,13 +26,13 @@ export type Player = {
 
 export type Match = {
   matchStartTime: number;
-  informationContent: number | undefined;
-  umid: number | undefined;
-  valveRanked: boolean | undefined;
-  team1: Team | undefined;
-  team2: Team | undefined;
-  winnerDeltaRankValue: number | undefined;
-  loserDeltaRankValue: number | undefined;
+  informationContent: number;
+  umid: number;
+  valveRanked: boolean;
+  team1: Team;
+  team2: Team;
+  winnerDeltaRankValue: number;
+  loserDeltaRankValue: number;
   team1Id: number;
   team2Id: number;
   team1Name: string;

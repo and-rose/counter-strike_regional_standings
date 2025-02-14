@@ -1,7 +1,7 @@
 import fs from "fs";
 import Team from "./team";
 import RankingContext from "./ranking_context";
-import { EventData, Match, MatchDataJSON, Player } from "./types";
+import { EventData, Match, MatchDataJSON, Player } from "../types";
 
 const __highValueEvents = [6372, 6711, 6712, 6713, 6714, 6586, 6588]; //explicitly include RMR events, Majors
 

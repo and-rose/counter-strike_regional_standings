@@ -1,22 +1,9 @@
-import { ArgsSchema } from "./applicationConfig";
-import Ranking from "./model/ranking";
-import Report from "./model/report";
+import { Args } from "../applicationConfig";
+import Ranking from "./ranking";
+import Report from "./report";
 
-export function run(args: string[]) {
-  const rawArgs = {
-    regions: args[0],
-    filename: args[1],
-    date: args[2],
-  };
-
-  const parsedArgs = ArgsSchema.safeParse(rawArgs);
-
-  if (!parsedArgs.success) {
-    console.error("Invalid arguments:", parsedArgs.error.format());
-    process.exit(1);
-  }
-
-  let { regions, filename, date } = parsedArgs.data;
+export function run(args: Args) {
+  let { regions, filename, date } = args;
 
   // Parse matches and generate standings
   const { matches, teams } = Ranking.generateRanking(-1, filename);

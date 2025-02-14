@@ -6,7 +6,7 @@ import {
   Network,
   Player,
   Winning,
-} from "./types";
+} from "../types";
 import nthHighest from "./util/nth_highest";
 import Region from "./util/region";
 import { Event } from "./data_loader";
@@ -37,7 +37,7 @@ class TeamMatch {
   team: Team;
   teamNumber: number;
   isWinner: boolean;
-  opponent: Team | undefined;
+  opponent: Team;
 
   constructor(team: Team, match: Match) {
     if (match.team1 !== team && match.team2 !== team) {
@@ -96,7 +96,7 @@ class Team {
   network: Network[];
   opponentNetwork: number;
   rankValue: number;
-  glickoTeam: GlickoTeam | undefined;
+  glickoTeam: GlickoTeam;
   seedValue: number;
   rankValueSeed: number;
   startingRankValue: number;
@@ -133,7 +133,7 @@ class Team {
     this.network = [];
     this.opponentNetwork = 0;
     this.rankValue = 0;
-    this.glickoTeam = undefined;
+    this.glickoTeam = new GlickoTeam(0, 0);
     this.seedValue = 0;
     this.rankValueSeed = 0;
     this.startingRankValue = 0;
