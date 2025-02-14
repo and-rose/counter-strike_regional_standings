@@ -1,7 +1,5 @@
 import fs from "fs";
-import Region from "./util/region";
 import Team from "./team";
-import remapValueClamped from "./util/remap_value_clamped";
 import RankingContext from "./ranking_context";
 import { EventData, Match, MatchDataJSON, Player } from "./types";
 
@@ -30,7 +28,7 @@ function filterIncompleteMatches(matches: Match[]) {
 }
 
 function filterMatchesByTime(
-  matches: any[],
+  matches: Match[],
   startTime: number,
   endTime: number,
 ) {
@@ -41,9 +39,9 @@ function filterMatchesByTime(
   );
 }
 
-function filterShowmatches(matches: Match[], events: Event[]) {
+function filterShowmatches(matches: Match[], events: Record<number, Event>) {
   return matches.filter((match) => {
-    let eventName = events[match.eventId].name;
+    const eventName = events[match.eventId].name;
 
     if (eventName.toLowerCase().includes("showmatch")) return false;
 
@@ -81,7 +79,7 @@ export class Event {
   eventId: number;
   name: string;
   prizePool: number;
-  prizeDistributionByTeamId: any;
+  prizeDistributionByTeamId: Record<number, EventTeam>;
   lan: boolean;
   lastMatchTime: number;
 
@@ -105,16 +103,16 @@ export class Event {
 
 function initTeams(
   matches: Match[],
-  events: Event[],
+  events: Record<number, Event>,
   rankingContext: RankingContext,
 ) {
-  let teams: Team[] = [];
+  const teams: Team[] = [];
 
   function insertTeam(name: string, players: Player[]) {
     let team = teams.find((team) => team.sharesRoster(players));
     if (team !== undefined) return team;
 
-    let rosterId = teams.length;
+    const rosterId = teams.length;
     team = new Team(rosterId, name, players);
     teams.push(team);
     return team;
@@ -163,12 +161,16 @@ function calculateMatchInformationContent(
   return informationContent;
 }
 
-function findTimeWindow(matches: any[], filterEnd: number, dataWindow: number) {
+function findTimeWindow(
+  matches: Match[],
+  filterEnd: number,
+  dataWindow: number,
+) {
   let endTime = filterEnd;
   if (endTime < 0)
     endTime = Math.max(...matches.map((match) => match.matchStartTime));
 
-  let startTime = endTime - dataWindow;
+  const startTime = endTime - dataWindow;
 
   return [startTime, endTime];
 }
@@ -239,12 +241,12 @@ class DataLoader {
       this.filterEndTime,
       this.filterWindow,
     );
-    let graceperiod = 30 * 24 * 3600; // 1 month
+    const graceperiod = 30 * 24 * 3600; // 1 month
     this.rankingContext.setTimeWindow(startTime, endTime - graceperiod);
     matches = filterMatchesByTime(matches, startTime, endTime);
 
     // initialize event list
-    let events: any = {};
+    const events: Record<number, Event> = {};
     dataJson.events.forEach(
       (eventJson: EventData) =>
         (events[eventJson.eventId] = new Event(eventJson)),
@@ -277,7 +279,7 @@ class DataLoader {
     // most recent match for a particular roster as the 'base' roster for that team.
     sortMatches(matches, "desc");
 
-    let teams = initTeams(matches, events, this.rankingContext);
+    const teams = initTeams(matches, events, this.rankingContext);
 
     // For processing the games and calculating ratings, we will go in forward order in time.  This
     // also has the effect of making sure that recent data is considered the most strongly, and also

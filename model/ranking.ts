@@ -3,7 +3,7 @@ import DataLoader from "./data_loader";
 import Glicko from "./glicko";
 import remapValueClamped from "./util/remap_value_clamped";
 import Team from "./team";
-import { Match } from "./types";
+import { Match, Modifiers } from "./types";
 
 const SEED_MODIFIER_FACTORS = {
   bountyCollected: 1,
@@ -15,8 +15,6 @@ const SEED_MODIFIER_FACTORS = {
 const MIN_SEEDED_RANK = 400;
 const MAX_SEEDED_RANK = 2000;
 
-const seedModifierFactors: Record<string, number> = SEED_MODIFIER_FACTORS;
-
 function generateRanking(versionTimestamp = -1, filename: string) {
   // Parameters
   const rankingContext = new RankingContext();
@@ -26,7 +24,7 @@ function generateRanking(versionTimestamp = -1, filename: string) {
   dataLoader.loadData(versionTimestamp, filename);
 
   let teams = dataLoader.teams;
-  let matches = dataLoader.matches;
+  const matches = dataLoader.matches;
 
   const glicko = new Glicko();
   glicko.setFixedRD(75); // glicko -> elo
@@ -58,8 +56,8 @@ function seedTeams(glicko: Glicko, teams: Team[]) {
   });
 
   // remap teams from current range to minRankValue..maxRankValue
-  let minSeedValue = Math.min(...teams.map((t) => t.seedValue));
-  let maxSeedValue = Math.max(...teams.map((t) => t.seedValue));
+  const minSeedValue = Math.min(...teams.map((t) => t.seedValue));
+  const maxSeedValue = Math.max(...teams.map((t) => t.seedValue));
 
   teams.forEach((team) => {
     team.rankValue = remapValueClamped(
@@ -78,14 +76,14 @@ function seedTeams(glicko: Glicko, teams: Team[]) {
   });
 }
 
-function calculateSeedModifierValue(modifiers: any) {
+function calculateSeedModifierValue(modifiers: Modifiers) {
   let sumCoeff = 0;
   let scaledMods = 0;
-  for (const factor of Object.keys(seedModifierFactors) as Array<
-    keyof typeof seedModifierFactors
+  for (const factor of Object.keys(SEED_MODIFIER_FACTORS) as Array<
+    keyof typeof SEED_MODIFIER_FACTORS
   >) {
-    sumCoeff += seedModifierFactors[factor];
-    scaledMods += seedModifierFactors[factor] * (modifiers[factor] ?? 0);
+    sumCoeff += SEED_MODIFIER_FACTORS[factor];
+    scaledMods += SEED_MODIFIER_FACTORS[factor] * (modifiers[factor] ?? 0);
   }
   sumCoeff = sumCoeff === 0 ? 1 : sumCoeff;
   return scaledMods / sumCoeff;
@@ -97,10 +95,10 @@ function calculateSeedModifierValue(modifiers: any) {
 function runMatches(glicko: Glicko, matches: Match[]) {
   //matches.reverse();
   matches.forEach((match) => {
-    let team1 = match.team1!;
-    let team2 = match.team2!;
+    const team1 = match.team1!;
+    const team2 = match.team2!;
 
-    let [winTeam, loseTeam] =
+    const [winTeam, loseTeam] =
       match.winningTeam === 1 ? [team1, team2] : [team2, team1];
 
     winTeam.startingRankValue = winTeam.glickoTeam!.rank();
@@ -126,7 +124,7 @@ function applyRanking(teams: Team[]) {
   teams.sort((a, b) => b.rankValue - a.rankValue);
 
   let globalRank = 0;
-  let regions = [0, 1, 2];
+  const regions = [0, 1, 2];
 
   teams.forEach((t) => {
     if (t.matchesPlayed >= 10) {

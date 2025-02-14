@@ -1,5 +1,5 @@
 function nthHighest(
-  arr: any[],
+  arr: number[],
   nth: number,
   compare = (a: number, b: number) => b - a,
 ) {

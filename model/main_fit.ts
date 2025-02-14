@@ -1,7 +1,7 @@
 import Fit from "./fit";
 
 function run() {
-  let analysis = Fit.init();
+  const analysis = Fit.init();
 
   // Evaluation loop
   let currentTimestamp = analysis.dataset().mostRecentMatch();
@@ -17,4 +17,3 @@ function run() {
 }
 
 run();
-

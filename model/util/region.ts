@@ -256,7 +256,7 @@ var regionMap = [
   { countrycode: "ve", region: "SA" },
 ];
 
-function getCountryRegion(playerCountry) {
+function getCountryRegion(playerCountry: string) {
   let record = regionMap.filter(
     (el) => el.countrycode.toLowerCase() === playerCountry.toLowerCase(),
   )[0];
@@ -272,4 +272,3 @@ function getCountryRegion(playerCountry) {
 }
 
 export default { getCountryRegion };
-

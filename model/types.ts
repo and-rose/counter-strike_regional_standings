@@ -66,3 +66,26 @@ export type Network = {
   base: number;
   val: number;
 };
+
+export type Modifiers = {
+  bountyCollected: number;
+  bountyOffered: number;
+  opponentNetwork: number;
+  ownNetwork: number;
+  lanFactor: number;
+};
+
+export type LanWin = {
+  id: number;
+  context: number;
+  base: number;
+  val: number;
+};
+
+export type Winning = {
+  id: number;
+  eventTime: number;
+  age: number;
+  base: number;
+  val: number;
+};

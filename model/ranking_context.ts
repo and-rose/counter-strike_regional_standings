@@ -55,4 +55,3 @@ class RankingContext {
 }
 
 export default RankingContext;
-

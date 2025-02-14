@@ -1,7 +1,5 @@
 import fs from "fs";
-import path from "path";
 import Table from "./table";
-import Ranking from "./ranking";
 import Team from "./team";
 import nthHighest from "./util/nth_highest";
 import { Player } from "./types";
@@ -17,11 +15,11 @@ function formatLine(line: string, newline = false) {
 }
 
 function generateOutput(teams: Team[], strDate: string) {
-  let fileDate = strDate.replaceAll("-", "_");
-  let year = fileDate.slice(0, 4);
-  let dayOfMonth = Number(strDate.slice(-2));
-  let invitationFolder = `../invitation/${year}/`;
-  let liveFolder = `../live/${year}/`;
+  const fileDate = strDate.replaceAll("-", "_");
+  const year = fileDate.slice(0, 4);
+  const dayOfMonth = Number(strDate.slice(-2));
+  const invitationFolder = `invitation/${year}/`;
+  const liveFolder = `live/${year}/`;
 
   if (dayOfMonth < 8) {
     if (!fs.existsSync(invitationFolder + `${summaryFolder}${fileDate}/`))
@@ -71,7 +69,7 @@ function generateOutput(teams: Team[], strDate: string) {
 
   teams.forEach((t) => {
     if (t.globalRank > 0) {
-      let paddedRank = t.globalRank.toString().padStart(4, "0");
+      const paddedRank = t.globalRank.toString().padStart(4, "0");
 
       const filename = `${summaryFolder}${fileDate}/${paddedRank}--${sanitize(t.name)}--${sanitizeRoster(t.players)}${format}`;
       fs.writeFileSync(
@@ -102,13 +100,13 @@ function sanitize(text: string, replacement = "-") {
 }
 
 function sanitizeRoster(roster: Player[], delimiter = ", ") {
-  let text = sortCaseInsensitive(roster.map((el) => el.nick)).join(delimiter);
+  const text = sortCaseInsensitive(roster.map((el) => el.nick)).join(delimiter);
   return sanitize(text);
 }
 
 function displayRankings(teams: Team[], regions: number[], strDate: string) {
   let output = "";
-  let fileDate = strDate.replaceAll("-", "_");
+  const fileDate = strDate.replaceAll("-", "_");
 
   // Get the region we are doing standings for
   let standings = "Standings";
@@ -395,9 +393,9 @@ function displayTeamRankingSummary(team: Team, teams: Team[], strDate: string) {
 
   team.winnings.sort((a, b) => b.eventTime - a.eventTime);
   team.winnings.forEach((w, _) => {
-    let d = new Date(0);
+    const d = new Date(0);
     d.setUTCSeconds(w.eventTime);
-    let strDate = d.toLocaleString("fr-CA", {
+    const strDate = d.toLocaleString("fr-CA", {
       year: "numeric",
       month: "2-digit",
       day: "2-digit",
@@ -412,7 +410,7 @@ function displayTeamRankingSummary(team: Team, teams: Team[], strDate: string) {
     winningsTable.commitRow();
   });
 
-  let winningsTableString = winningsTable.printMarkdownToString();
+  const winningsTableString = winningsTable.printMarkdownToString();
   output += "\n" + winningsTableString + "\n";
 
   output += formatLine("", true);

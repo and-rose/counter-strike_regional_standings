@@ -1,8 +1,17 @@
-import { Bounty, Match, Network, Player } from "./types";
+import {
+  Bounty,
+  LanWin,
+  Match,
+  Modifiers,
+  Network,
+  Player,
+  Winning,
+} from "./types";
 import nthHighest from "./util/nth_highest";
 import Region from "./util/region";
 import { Event } from "./data_loader";
 import { GlickoTeam } from "./glicko";
+import RankingContext from "./ranking_context";
 const TEAM_OVERLAP_TO_SHARE_ROSTER = 3;
 
 class TeamEvent {
@@ -71,7 +80,7 @@ class Team {
   matchesPlayed: number;
   eventMap: Map<number, TeamEvent>;
   lastPlayed: number;
-  modifiers: any;
+  modifiers: Modifiers;
   region: number[];
   regionalRank: number[];
   distinctTeamsDefeated: number;
@@ -102,7 +111,13 @@ class Team {
     this.matchesPlayed = 0;
     this.eventMap = new Map();
     this.lastPlayed = 0;
-    this.modifiers = {};
+    this.modifiers = {
+      bountyCollected: 0,
+      bountyOffered: 0,
+      opponentNetwork: 0,
+      ownNetwork: 0,
+      lanFactor: 0,
+    };
     this.region = getPluralityRegion(this.players);
     this.regionalRank = [-1, -1, -1];
     this.distinctTeamsDefeated = 0;
@@ -162,7 +177,7 @@ class Team {
     }
   }
 
-  static initializeSeedingModifiers(teams: Team[], context: any) {
+  static initializeSeedingModifiers(teams: Team[], context: RankingContext) {
     function curveFunction(x: number) {
       return Math.pow(1 / (1 + Math.abs(Math.log10(x))), 1);
     }
@@ -194,9 +209,9 @@ class Team {
       team.distinctTeamsDefeated = 0;
       team.scaledWinnings = 0;
 
-      let winnings: any[] = [];
+      let winnings: Winning[] = [];
       let opponentMap = new Map();
-      let lanWins: any[] = [];
+      let lanWins: LanWin[] = [];
 
       // Calculate the most recent match against each opponent, and also the most recent LAN wins.
       team.wonMatches.forEach((wonMatch) => {
@@ -215,7 +230,7 @@ class Team {
         let matchContext = timestampModifier;
         let scaledLan = lan * matchContext;
         lanWins.push({
-          id: id,
+          id: id!,
           context: matchContext,
           base: lan,
           val: scaledLan,

@@ -1,5 +1,5 @@
 // Pad/truncate a string to a given length
-function stringWithLength(s, n, padDirection = -1) {
+function stringWithLength(s: string, n: number, padDirection = -1) {
   s = String(s);
 
   // check for strings that are short enough
@@ -21,8 +21,16 @@ function stringWithLength(s, n, padDirection = -1) {
 // customizing sorting, printing, summaries, etc.
 //
 // Works by default for strings.
-class Column {
-  constructor(name) {
+class Column<T> {
+  name: string;
+  elems: T[];
+  minWidth: number | null;
+  maxWidth: number | null;
+  sortOrder: number;
+  padDirection: number;
+  width: number;
+
+  constructor(name: string) {
     this.name = String(name);
     this.elems = [];
 
@@ -31,15 +39,15 @@ class Column {
     this.sortOrder = 1;
     this.padDirection = 1; // left-justify
 
-    this.width = null;
+    this.width = 1;
   }
 
-  setMinWidth(w) {
+  setMinWidth(w: number) {
     this.minWidth = w;
     return this;
   }
 
-  setMaxWidth(w) {
+  setMaxWidth(w: number) {
     this.maxWidth = w;
     return this;
   }
@@ -64,14 +72,14 @@ class Column {
     return this;
   }
 
-  addElem(elem) {
+  addElem(elem: T) {
     const v = this.sanitize(elem);
 
     this.accumulateSummary(v);
     this.elems.push(v);
   }
 
-  formatValue(val) {
+  formatValue(val: string) {
     if (this.width === null)
       throw new Error("must finalize() before getting data from column");
 
@@ -82,7 +90,7 @@ class Column {
     return this.formatValue(this.name);
   }
 
-  resultRow(idxRow) {
+  resultRow(idxRow: number) {
     return this.formatValue(this.elemString(this.elems[idxRow]));
   }
 
@@ -92,7 +100,7 @@ class Column {
 
   // Sort the table by this column
   getSortOrder() {
-    let ks = Array(...this.elems.keys());
+    const ks = Array(...this.elems.keys());
     ks.sort((idxL, idxR) => {
       return (
         this.elemCompare(this.elems[idxL], this.elems[idxR]) * this.sortOrder
@@ -124,19 +132,19 @@ class Column {
 
   // Expansion point for overriding
   // Handle sorting.
-  elemCompare(elemL, elemR) {
+  elemCompare(elemL: T, elemR: T) {
     return String(elemL).localeCompare(String(elemR));
   }
 
   // Expansion point for overriding
   // A new element was added, validate it.
-  sanitize(elem) {
-    return String(elem);
+  sanitize(elem: T) {
+    return elem;
   }
 
   // Expansion point for overriding
   // A new element was added, include it in the summary
-  accumulateSummary(elem) {}
+  accumulateSummary(elem: T) {}
 
   // Expansion point for overriding
   // Return the string representation for the summary row.
@@ -146,33 +154,40 @@ class Column {
 
   // Expansion point for overriding
   // Return the string representation of this element
-  elemString(elem) {
+  elemString(elem: T) {
     return String(elem);
   }
 }
 
 // Numeric columns
-class NumericColumn extends Column {
-  constructor(name) {
+class NumericColumn extends Column<number> {
+  precision: number | null;
+  summaryPrecision: number | null;
+  accum: number;
+  accumCount: number;
+
+  constructor(name: string) {
     super(name);
     this.precision = null;
     this.summaryPrecision = null;
+    this.accum = 0;
+    this.accumCount = 0;
     this.setAlignRight();
   }
 
-  setPrecision(digits) {
+  setPrecision(digits: number) {
     this.precision = digits;
     return this;
   }
 
-  setSummaryPrecision(digits) {
+  setSummaryPrecision(digits: number) {
     this.summaryPrecision = digits;
     return this;
   }
 
   setSummarySum() {
     this.accum = 0;
-    this.accumulateSummary = function accumulateSum(elem) {
+    this.accumulateSummary = function accumulateSum(elem: number) {
       this.accum = this.accum + elem;
     };
     this.getSummary = function getSum() {
@@ -207,20 +222,20 @@ class NumericColumn extends Column {
     return this;
   }
 
-  elemCompare(elemL, elemR) {
+  elemCompare(elemL: number, elemR: number) {
     return elemL - elemR;
   }
 
-  sanitize(elem) {
+  sanitize(elem: number) {
     return Number(elem);
   }
 
-  elemString(elem) {
+  elemString(elem: number) {
     if (this.precision !== null) return elem.toFixed(this.precision);
     else return String(elem);
   }
 
-  summaryString(elem) {
+  summaryString(elem: number) {
     if (this.summaryPrecision !== null)
       return elem.toFixed(this.summaryPrecision);
     else return this.elemString(elem);
@@ -231,13 +246,17 @@ class Table {
   static Column = Column;
   static NumericColumn = NumericColumn;
 
+  columns: Column<any>[];
+  sortColumn: Column<any> | null;
+  rowLength: number | null;
+
   constructor() {
     this.columns = [];
     this.sortColumn = null;
     this.rowLength = null;
   }
 
-  addColumnObject(col) {
+  addColumnObject<T extends Column<string> | NumericColumn>(col: T): T {
     if (this.rowLength !== null)
       throw new Error("Adding a column after table has data.");
 
@@ -245,19 +264,19 @@ class Table {
     return col;
   }
 
-  addColumn(name) {
-    return this.addColumnObject(new Column(name));
+  addColumn(name: string) {
+    return this.addColumnObject(new Column<string>(name));
   }
 
-  addNumericColumn(name) {
+  addNumericColumn(name: string) {
     return this.addColumnObject(new NumericColumn(name));
   }
 
-  sortOn(col) {
+  sortOn<T>(col: Column<T>) {
     this.sortColumn = col;
   }
 
-  addElem(data) {
+  addElem<T>(data: T) {
     if (this.rowLength === null) this.rowLength = 0;
 
     if (this.rowLength >= this.columns.length)
@@ -297,9 +316,9 @@ class Table {
     }
 
     // Generate table
-    let tableRows = [];
+    const tableRows: string[][] = [];
     for (const idxRow of order) {
-      let row = [];
+      const row: string[] = [];
       for (const col of this.columns) {
         row.push(col.resultRow(idxRow));
       }
@@ -307,21 +326,21 @@ class Table {
     }
 
     // Generate header & summary
-    let headerRow = [];
-    let summaryRow = [];
+    const headerRow: string[] = [];
+    const summaryRow: string[] = [];
     for (const col of this.columns) {
       headerRow.push(col.resultName());
       summaryRow.push(col.resultSummary());
     }
 
-    return [headerRow, tableRows, summaryRow];
+    return { headerRow, tableRows, summaryRow };
   }
 
   print() {
-    let [headerRow, tableRows, summaryRow] = this.generate();
+    const { headerRow, tableRows, summaryRow } = this.generate();
 
     // Build separator row
-    let sepRowSplit = [];
+    const sepRowSplit = [];
     for (const col of this.columns) {
       sepRowSplit.push("-".repeat(col.width));
     }
@@ -338,15 +357,15 @@ class Table {
   }
 
   printMarkdown() {
-    function markdownRow(arr) {
+    function markdownRow(arr: string[]) {
       return ["| ", arr.join(" | "), " |"].join("");
     }
 
     // TODO: should probably escape markdown special characters.
-    let [headerRow, tableRows, summaryRow] = this.generate();
+    const { headerRow, tableRows, summaryRow } = this.generate();
 
     // Generate alignment/table-header row
-    let sepRowSplit = [];
+    const sepRowSplit = [];
     for (const col of this.columns) {
       let headerSep;
       if (col.padDirection < 0) {
@@ -369,15 +388,15 @@ class Table {
   }
 
   printMarkdownToString() {
-    function markdownRow(arr) {
+    function markdownRow(arr: string[]) {
       return ["| ", arr.join(" | "), " |"].join("") + "\n";
     }
 
     // TODO: should probably escape markdown special characters.
-    let [headerRow, tableRows, summaryRow] = this.generate();
+    const { headerRow, tableRows, summaryRow } = this.generate();
 
     // Generate alignment/table-header row
-    let sepRowSplit = [];
+    const sepRowSplit = [];
     for (const col of this.columns) {
       let headerSep;
       if (col.padDirection < 0) {
@@ -405,4 +424,3 @@ class Table {
 }
 
 export default Table;
-

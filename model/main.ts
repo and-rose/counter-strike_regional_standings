@@ -1,40 +1,52 @@
+import { ArgsSchema } from "./applicationConfig";
 import Ranking from "./ranking";
 import Report from "./report";
-const RegionList = ["Europe", "Americas", "Asia"];
 
 function run() {
-  let regions = [0, 1, 2];
-  if (process.argv[2] !== undefined) regions = JSON.parse(process.argv[2]);
+  const rawArgs = {
+    regions: process.argv[2],
+    filename: process.argv[3],
+    date: process.argv[4],
+  };
 
-  let filename = "../data/matchdata.json";
-  if (process.argv[3] !== undefined) filename = process.argv[3];
+  const parsedArgs = ArgsSchema.safeParse(rawArgs);
+
+  if (!parsedArgs.success) {
+    console.error("Invalid arguments:", parsedArgs.error.format());
+    process.exit(1);
+  }
+
+  let { regions, filename, date } = parsedArgs.data;
 
   // Parse matches and generate standings
-  let { matches, teams } = Ranking.generateRanking(-1, filename);
+  const { matches, teams } = Ranking.generateRanking(-1, filename);
 
-  // Get date of most recent match
-  let mostRecentMatch = Math.max(...matches.map((m) => m.matchStartTime));
-
-  // format date as YYYY-MM-DD
-  let d = new Date(0);
-  d.setUTCSeconds(mostRecentMatch);
-  let strDate = d.toLocaleString("fr-CA", {
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-    timeZone: "America/Los_Angeles",
-  });
+  // Get date of most recent match if not provided
+  if (!date) {
+    const mostRecentMatch = Math.max(...matches.map((m) => m.matchStartTime));
+    const d = new Date(0);
+    d.setUTCSeconds(mostRecentMatch);
+    date = d.toLocaleString("fr-CA", {
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+      timeZone: "America/Los_Angeles",
+    });
+  }
 
   // Get the region we are doing standings for
   let standings = "Standings";
   if (regions.length === 1) {
-    standings = `Regional Standings for ${RegionList[regions[0]]}`;
+    standings = `Regional Standings for ${regions[0]}`;
   }
 
-  if (process.argv[4] !== undefined) strDate = process.argv[4];
-
   // Print markdown table for results
-  Report.generateOutput(teams, strDate);
+  Report.generateOutput(teams, date);
+
+  console.log("Standings generated successfully! 🎉");
+  console.log(
+    `Output(s) saved to 'live/standings_[region]_${date.replace("-", "_")}.md'`,
+  );
 }
 
 run();
