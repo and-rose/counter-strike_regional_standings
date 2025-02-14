@@ -2,11 +2,11 @@ import { ArgsSchema } from "./applicationConfig";
 import Ranking from "./model/ranking";
 import Report from "./model/report";
 
-function run() {
+export function run(args: string[]) {
   const rawArgs = {
-    regions: process.argv[2],
-    filename: process.argv[3],
-    date: process.argv[4],
+    regions: args[0],
+    filename: args[1],
+    date: args[2],
   };
 
   const parsedArgs = ArgsSchema.safeParse(rawArgs);
@@ -48,5 +48,3 @@ function run() {
     `Output(s) saved to 'live/standings_[region]_${date.replace("-", "_")}.md'`,
   );
 }
-
-run();
