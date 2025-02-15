@@ -16,21 +16,6 @@ const teamSummaries = await getFiles(
 );
 
 describe("Markdown file snapshot test", () => {
-  beforeAll(async () => {
-    // trigger the script
-
-    // purge the output directory
-    const outputDir = path.resolve(__dirname, "../output/live/2023");
-    await fs.rm(outputDir, { recursive: true });
-
-    const args = {
-      regions: ["Americas", "Europe", "Asia"],
-      filename: "data/matchdata_sample_20230829.json",
-    };
-
-    run(args);
-  });
-
   it("produces expected global standings file", async () => {
     const filePath = path.resolve(
       __dirname,
